@@ -1,0 +1,20 @@
+ans 1 a) class MyClass { }
+
+ans 2 b) private
+
+ans 3 b)  A constructor can have the same name as the class.
+
+ans 4 c) 5
+
+ans 5 b) It is used to access the instance members of the current object.
+
+ans 6 b) public int x { get; set; }
+
+ans 7 a) Compilation error
+
+ans 8 None of the given options are fully correct because the code contains errors.
+
+ans 9 =  2,3 and 5
+
+ans 10 = 1 and 3
+ 

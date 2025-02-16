@@ -1,0 +1,493 @@
+# ARRAY
+1.public static int MaxSubarraySum(int[] arr)
+{
+    int maxSum = int.MinValue, currentSum = 0;
+
+    foreach (int num in arr)
+    {
+        currentSum = Math.Max(num, currentSum + num);
+        maxSum = Math.Max(maxSum, currentSum);
+    }
+
+    return maxSum;
+}
+
+2.public static int[] FindIntersection(int[] arr1, int[] arr2)
+{
+    List<int> intersection = new List<int>();
+    HashSet<int> set1 = new HashSet<int>(arr1);
+
+    foreach (int num in arr2)
+    {
+        if (set1.Contains(num))
+        {
+            intersection.Add(num);
+            set1.Remove(num); // To avoid duplicates
+        }
+    }
+
+    return intersection.ToArray();
+}
+
+public static int[] FindUnion(int[] arr1, int[] arr2)
+{
+    HashSet<int> unionSet = new HashSet<int>(arr1);
+    
+    foreach (int num in arr2)
+    {
+        unionSet.Add(num);
+    }
+
+    return unionSet.ToArray();
+}
+
+3.public static int[,] MultiplySparseMatrices(int[,] A, int[,] B)
+{
+    int rowsA = A.GetLength(0), colsA = A.GetLength(1);
+    int rowsB = B.GetLength(0), colsB = B.GetLength(1);
+
+    if (colsA != rowsB) throw new ArgumentException("Matrix dimensions are not valid for multiplication");
+
+    int[,] result = new int[rowsA, colsB];
+
+    for (int i = 0; i < rowsA; i++)
+    {
+        for (int k = 0; k < colsA; k++)
+        {
+            if (A[i, k] != 0) // Sparse optimization
+            {
+                for (int j = 0; j < colsB; j++)
+                {
+                    if (B[k, j] != 0)
+                    {
+                        result[i, j] += A[i, k] * B[k, j];
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+4.public static int FirstMissingPositive(int[] nums)
+{
+    int n = nums.Length;
+
+    for (int i = 0; i < n; i++)
+    {
+        while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] != nums[i])
+        {
+            // Swap nums[i] and nums[nums[i] - 1]
+            int temp = nums[nums[i] - 1];
+            nums[nums[i] - 1] = nums[i];
+            nums[i] = temp;
+        }
+    }
+
+    for (int i = 0; i < n; i++)
+    {
+        if (nums[i] != i + 1) return i + 1;
+    }
+
+    return n + 1;
+}
+
+5.public static void RotateMatrix(int[,] matrix)
+{
+    int n = matrix.GetLength(0);
+
+    for (int layer = 0; layer < n / 2; layer++)
+    {
+        int first = layer;
+        int last = n - 1 - layer;
+
+        for (int i = first; i < last; i++)
+        {
+            int offset = i - first;
+
+            // Save top
+            int top = matrix[first, i];
+
+            // Left -> Top
+            matrix[first, i] = matrix[last - offset, first];
+
+            // Bottom -> Left
+            matrix[last - offset, first] = matrix[last, last - offset];
+
+            // Right -> Bottom
+            matrix[last, last - offset] = matrix[i, last];
+
+            // Top -> Right
+            matrix[i, last] = top;
+        }
+    }
+}
+
+#Classes (Advanced Level)
+
+1.using System;
+using System.Collections.Generic;
+
+public class StockPortfolio
+{
+    private Dictionary<string, (int shares, double pricePerShare)> stocks;
+
+    public StockPortfolio()
+    {
+        stocks = new Dictionary<string, (int, double)>();
+    }
+
+    public void AddStock(string symbol, int shares, double pricePerShare)
+    {
+        if (stocks.ContainsKey(symbol))
+        {
+            stocks[symbol] = (stocks[symbol].shares + shares, pricePerShare);
+        }
+        else
+        {
+            stocks[symbol] = (shares, pricePerShare);
+        }
+    }
+
+    public void RemoveStock(string symbol)
+    {
+        if (stocks.ContainsKey(symbol))
+        {
+            stocks.Remove(symbol);
+        }
+        else
+        {
+            Console.WriteLine("Stock not found.");
+        }
+    }
+
+    public double GetTotalPortfolioValue()
+    {
+        double totalValue = 0;
+        foreach (var stock in stocks)
+        {
+            totalValue += stock.Value.shares * stock.Value.pricePerShare;
+        }
+        return totalValue;
+    }
+}
+
+2.using System;
+using System.Collections.Generic;
+
+public class SmartHomeSystem
+{
+    private HashSet<string> devices;
+    private bool allDevicesOn;
+
+    public SmartHomeSystem()
+    {
+        devices = new HashSet<string>();
+        allDevicesOn = false;
+    }
+
+    public void AddDevice(string deviceName)
+    {
+        devices.Add(deviceName);
+    }
+
+    public void RemoveDevice(string deviceName)
+    {
+        devices.Remove(deviceName);
+    }
+
+    public void ToggleAllDevices(bool turnOn)
+    {
+        allDevicesOn = turnOn;
+        Console.WriteLine(turnOn ? "All devices turned ON." : "All devices turned OFF.");
+    }
+}
+
+3.using System;
+using System.Collections.Generic;
+
+public class TaskScheduler
+{
+    private SortedDictionary<int, Queue<string>> taskQueue;
+
+    public TaskScheduler()
+    {
+        taskQueue = new SortedDictionary<int, Queue<string>>();
+    }
+
+    public void AddTask(string task, int priority)
+    {
+        if (!taskQueue.ContainsKey(priority))
+        {
+            taskQueue[priority] = new Queue<string>();
+        }
+        taskQueue[priority].Enqueue(task);
+    }
+
+    public void ExecuteNextTask()
+    {
+        if (taskQueue.Count == 0)
+        {
+            Console.WriteLine("No tasks in the queue.");
+            return;
+        }
+
+        int highestPriority = taskQueue.Keys.Min();
+        string task = taskQueue[highestPriority].Dequeue();
+
+        if (taskQueue[highestPriority].Count == 0)
+        {
+            taskQueue.Remove(highestPriority);
+        }
+
+        Console.WriteLine($"Executing task: {task} (Priority: {highestPriority})");
+    }
+}
+
+4.using System;
+using System.Security.Cryptography;
+using System.Text;
+
+public class BlockchainTransaction
+{
+    public string Sender { get; }
+    public string Receiver { get; }
+    public double Amount { get; }
+    public string Hash { get; }
+
+    public BlockchainTransaction(string sender, string receiver, double amount)
+    {
+        Sender = sender;
+        Receiver = receiver;
+        Amount = amount;
+        Hash = GenerateHash();
+    }
+
+    private string GenerateHash()
+    {
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            string rawData = $"{Sender}{Receiver}{Amount}";
+            byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+            return BitConverter.ToString(bytes).Replace("-", "").ToLower();
+        }
+    }
+
+    public bool ValidateTransaction()
+    {
+        return Hash == GenerateHash();
+    }
+}
+
+5.using System;
+
+public class SongNode
+{
+    public string SongName { get; set; }
+    public SongNode Next { get; set; }
+    public SongNode Prev { get; set; }
+
+    public SongNode(string songName)
+    {
+        SongName = songName;
+        Next = Prev = null;
+    }
+}
+
+public class MusicPlaylist
+{
+    private SongNode head, tail;
+    private SongNode currentSong;
+
+    public MusicPlaylist()
+    {
+        head = tail = currentSong = null;
+    }
+
+    public void AddSong(string songName)
+    {
+        SongNode newNode = new SongNode(songName);
+
+        if (head == null)
+        {
+            head = tail = newNode;
+        }
+        else
+        {
+            tail.Next = newNode;
+            newNode.Prev = tail;
+            tail = newNode;
+        }
+    }
+
+    public void RemoveSong(string songName)
+    {
+        SongNode temp = head;
+        while (temp != null)
+        {
+            if (temp.SongName == songName)
+            {
+                if (temp.Prev != null) temp.Prev.Next = temp.Next;
+                if (temp.Next != null) temp.Next.Prev = temp.Prev;
+                if (temp == head) head = temp.Next;
+                if (temp == tail) tail = temp.Prev;
+                return;
+            }
+            temp = temp.Next;
+        }
+    }
+
+    public void PlayNext()
+    {
+        if (currentSong == null) currentSong = head;
+        else currentSong = currentSong.Next;
+
+        Console.WriteLine(currentSong != null ? $"Playing: {currentSong.SongName}" : "End of playlist.");
+    }
+
+    public void PlayPrevious()
+    {
+        if (currentSong == null) currentSong = tail;
+        else currentSong = currentSong.Prev;
+
+        Console.WriteLine(currentSong != null ? $"Playing: {currentSong.SongName}" : "Start of playlist.");
+    }
+}
+
+Polymorphism (Advanced Level)
+
+1.using System;
+
+public class ExpressionEvaluator
+{
+    public double Value { get; private set; }
+
+    public ExpressionEvaluator(double value)
+    {
+        Value = value;
+    }
+
+    public static ExpressionEvaluator operator +(ExpressionEvaluator a, ExpressionEvaluator b)
+        => new ExpressionEvaluator(a.Value + b.Value);
+
+    public static ExpressionEvaluator operator -(ExpressionEvaluator a, ExpressionEvaluator b)
+        => new ExpressionEvaluator(a.Value - b.Value);
+
+    public static ExpressionEvaluator operator *(ExpressionEvaluator a, ExpressionEvaluator b)
+        => new ExpressionEvaluator(a.Value * b.Value);
+
+    public static ExpressionEvaluator operator /(ExpressionEvaluator a, ExpressionEvaluator b)
+    {
+        if (b.Value == 0)
+            throw new DivideByZeroException("Cannot divide by zero.");
+        return new ExpressionEvaluator(a.Value / b.Value);
+    }
+
+    public override string ToString() => Value.ToString("F2");
+}
+
+2.using System;
+
+public abstract class DatabaseConnector
+{
+    public abstract void Connect();
+}
+
+public class SQLDatabase : DatabaseConnector
+{
+    public override void Connect()
+    {
+        Console.WriteLine("Connected to SQL Database.");
+    }
+}
+
+public class MongoDBDatabase : DatabaseConnector
+{
+    public override void Connect()
+    {
+        Console.WriteLine("Connected to MongoDB Database.");
+    }
+}
+
+public class FirebaseDatabase : DatabaseConnector
+{
+    public override void Connect()
+    {
+        Console.WriteLine("Connected to Firebase Database.");
+    }
+}
+
+3.using System;
+
+public class FileCompressor
+{
+    public void Compress(string textFile)
+    {
+        Console.WriteLine($"Compressing text file: {textFile}");
+    }
+
+    public void Compress(byte[] imageData)
+    {
+        Console.WriteLine("Compressing image file.");
+    }
+
+    public void Compress(byte[] videoData, int resolution)
+    {
+        Console.WriteLine($"Compressing video file at {resolution}p resolution.");
+    }
+}
+
+4. using System;
+
+public abstract class AIModel
+{
+    public abstract void TrainModel();
+}
+
+public class BasicAI : AIModel
+{
+    public override void TrainModel()
+    {
+        Console.WriteLine("Training Basic AI with simple rules.");
+    }
+}
+
+public class NeuralNet : AIModel
+{
+    public override void TrainModel()
+    {
+        Console.WriteLine("Training Neural Network with backpropagation.");
+    }
+}
+
+public class DeepLearning : AIModel
+{
+    public override void TrainModel()
+    {
+        Console.WriteLine("Training Deep Learning model with multi-layer neural networks.");
+    }
+}
+
+5.using System;
+
+public abstract class GamePhysicsEngine
+{
+    public abstract void SimulatePhysics();
+}
+
+public class Physics2D : GamePhysicsEngine
+{
+    public override void SimulatePhysics()
+    {
+        Console.WriteLine("Simulating 2D physics with gravity and collisions.");
+    }
+}
+
+public class Physics3D : GamePhysicsEngine
+{
+    public override void SimulatePhysics()
+    {
+        Console.WriteLine("Simulating 3D physics with rigid bodies and forces.");
+    }
+}
